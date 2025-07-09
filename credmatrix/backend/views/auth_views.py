@@ -9,11 +9,12 @@ from ..models import User, Entity, EntityType, OTP
 from backend.services.email_service import send_email
 import random
 
+
 class signup_view(APIView):
     """
     Signup API
     ---
-    Allows users to sign up by providing email, password, name, entity_name, and entity_type.
+    Allows users to sign up by providing email, password, name, entity_name, entity_type, and OTP.
     """
     @extend_schema(
         request={
@@ -25,13 +26,14 @@ class signup_view(APIView):
                     "name": {"type": "string", "example": "John Doe"},
                     "entity_name": {"type": "string", "example": "CredMatrix Inc."},
                     "entity_type": {"type": "string", "example": "STARTUP"},
+                    "otp": {"type": "string", "example": "123456"},
                 },
-                "required": ["email", "password", "name", "entity_name", "entity_type"],
+                "required": ["email", "password", "name", "entity_name", "entity_type", "otp"],
             }
         },
         responses={
             201: {"description": "User created successfully"},
-            400: {"description": "Invalid entity type"},
+            400: {"description": "Invalid entity type or incorrect OTP"},
         },
     )
     def post(self, request):
@@ -41,10 +43,19 @@ class signup_view(APIView):
         name = data.get('name')
         entity_name = data.get('entity_name')
         entity_type = data.get('entity_type')
+        otp = data.get('otp')
 
         # Validate entity type
         if entity_type not in [etype.name for etype in EntityType]:
             return Response({"error": "Invalid entity type"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate OTP
+        try:
+            otp_record = OTP.objects.get(email=email)
+            if otp_record.otp != otp:
+                return Response({"error": "Incorrect OTP"}, status=status.HTTP_400_BAD_REQUEST)
+        except OTP.DoesNotExist:
+            return Response({"error": "OTP not found for this email"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Create entity
         entity = Entity.objects.create(name=entity_name, entity_type=entity_type)
@@ -63,8 +74,10 @@ class signup_view(APIView):
         user_group, _ = Group.objects.get_or_create(name='User')
         user.groups.add(user_group)
 
-        return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
+        # Delete OTP after successful signup
+        otp_record.delete()
 
+        return Response({"message": "User created successfully"}, status=status.HTTP_201_CREATED)
 
 class login_view(APIView):
     """
