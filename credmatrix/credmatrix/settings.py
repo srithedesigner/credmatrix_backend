@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'backend',
     'rest_framework',
     'drf_spectacular',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [
@@ -162,5 +163,6 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 AWS_ACCESS_KEY_ID=config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY=config('AWS_SECRET_ACCESS_KEY')
-AWS_BUCKET_NAME=config('AWS_STORAGE_BUCKET_NAME')   
-AWS_REGION=config('AWS_S3_REGION_NAME')
+AWS_BUCKET_NAME=config('AWS_BUCKET_NAME')
+AWS_TEST_BUCKET_NAME=config('AWS_TEST_BUCKET_NAME')
+AWS_REGION=config('AWS_REGION')

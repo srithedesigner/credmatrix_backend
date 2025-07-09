@@ -109,3 +109,15 @@ class Activity(models.Model):
 
     def __str__(self):
         return f"Activity for Report ID {self.report.id} by {self.user.email}"
+    
+
+class Payment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='payments')
+    amount = models.IntegerField()
+    payment_id = models.CharField(max_length=255)
+    order_id = models.CharField(max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(max_length=255)
+
+    def __str__(self):
+        return f"Payment of {self.amount} by {self.user.email}"

@@ -3,14 +3,14 @@ from botocore.exceptions import NoCredentialsError, PartialCredentialsError
 from django.conf import settings
 
 class S3Service:
-    def __init__(self):
+    def __init__(self, is_test=False):
         self.s3_client = boto3.client(
             's3',
             aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            aws_secret_access_key= settings.AWS_SECRET_ACCESS_KEY,
             region_name=settings.AWS_REGION,
         )
-        self.bucket_name = settings.AWS_BUCKET_NAME
+        self.bucket_name = settings.AWS_BUCKET_NAME if not is_test else settings.AWS_TEST_BUCKET_NAME
 
     def upload_file(self, file_key, expiration=3600):
         """
