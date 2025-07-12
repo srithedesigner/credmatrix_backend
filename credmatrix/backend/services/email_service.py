@@ -3,7 +3,7 @@ from django.conf import settings
 
 def send_email(subject, message, recipient_list, from_email=None):
     """
-    Utility function to send an email.
+    Utility function to send an email using Amazon SES.
     :param subject: Email subject
     :param message: Email body
     :param recipient_list: List of recipient email addresses
